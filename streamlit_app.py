@@ -12,12 +12,14 @@ st.set_page_config(
     page_icon='ndim.png',
     layout="wide"
 )
+
 # Define a password
-PASSWORD = "SpandanCore@2525"
+PASSWORD = "SpandanCo"
 
 # Initialize session state for authentication
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
+
 def login():
     """Check user password and authenticate."""
     if st.session_state.password == PASSWORD:
@@ -29,7 +31,7 @@ def logout():
     st.session_state.authenticated = False
 
 def load_data(folder_path):
-    """Load all CSV files from the specified folder structure."""
+    """Load all Excel files from the specified folder structure."""
     data_dict = {}
     years = [d for d in os.listdir(folder_path) if os.path.isdir(os.path.join(folder_path, d))]
     
@@ -38,11 +40,11 @@ def load_data(folder_path):
         data_dict[year] = {}
         
         for file in os.listdir(year_path):
-            if file.endswith('.csv'):
-                event_name = file.split('.')[0]  # Remove .csv extension
+            if file.endswith('.xlsx'):
+                event_name = file.split('.')[0]  # Remove .xlsx extension
                 file_path = os.path.join(year_path, file)
                 try:
-                    df = pd.read_csv(file_path)
+                    df = pd.read_excel(file_path)
                     data_dict[year][event_name] = df
                 except Exception as e:
                     st.error(f"Error loading {file}: {e}")
@@ -55,9 +57,9 @@ def clean_data(df):
     cleaned_df = df.copy()
     
     # Convert registration time to datetime
-    if 'Registration Time' in cleaned_df.columns:
-        cleaned_df['Registration Time'] = pd.to_datetime(cleaned_df['Registration Time'])
-        cleaned_df['Registration Date'] = cleaned_df['Registration Time'].dt.date
+    if 'Timestamp' in cleaned_df.columns:
+        cleaned_df['Timestamp'] = pd.to_datetime(cleaned_df['Timestamp'])
+        cleaned_df['Registration Date'] = cleaned_df['Timestamp'].dt.date
     
     # Handle missing values
     for col in cleaned_df.columns:
@@ -92,9 +94,9 @@ def plot_visualizations(df):
     row1_cols = st.columns(2)
     
     # Plot 1: Registration Trend
-    if 'Registration Time' in df.columns:
+    if 'Timestamp' in df.columns:
         df_trend = df.copy()
-        df_trend['Reg Date'] = pd.to_datetime(df_trend['Registration Time']).dt.date
+        df_trend['Reg Date'] = pd.to_datetime(df_trend['Timestamp']).dt.date
         reg_trend = df_trend.groupby('Reg Date').size().reset_index(name='Count')
         
         fig = px.line(reg_trend, x='Reg Date', y='Count', 
@@ -194,15 +196,14 @@ def combine_event_data(data_dict, selected_year):
     return all_events_df
 
 def main():
-    st.title("📈Spandan Registration Dashboard[Unstop]")
+    st.title("📈Spandan Registration Dashboard[Google]")
     st.markdown("#### Developed by [💻Pranay Sarkar](https://www.linkedin.com/in/pranay-sarkar/)")
     
     # Sidebar for navigation and filtering
     st.sidebar.header("Data Settings")
     
     # Folder path input
-    folder_path = "unstopReg"
-    
+    folder_path = "googleReg"
     
     if not os.path.isdir(folder_path):
         st.sidebar.error(f"Directory not found: {folder_path}")
@@ -217,7 +218,7 @@ def main():
             'Name': ['PULKIT TREHAN'],
             'Email': ['pulkit.pulkit.trehan@gmail.com'],
             'Country': ['India'],
-            'Registration Time': ['2024-02-14T17:45:59.000Z']
+            'Timestamp': ['2024-02-14T17:45:59.000Z']
         })
         st.dataframe(sample_df)
         
