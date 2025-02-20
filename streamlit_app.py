@@ -13,7 +13,8 @@ st.set_page_config(
     layout="wide"
 )
 # Define a password
-PASSWORD = "SpandanCore@2525"
+PASSWORD = os.getenv("PASS_WORD ")
+
 
 # Initialize session state for authentication
 if "authenticated" not in st.session_state:
